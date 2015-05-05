@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link rel="stylesheet" type="text/css"
+          href="http://yui.yahooapis.com/3.4.1/build/cssreset/cssreset-min.css">
+    <link href="http://fonts.googleapis.com/css?family=Varela+Round|Droid+Sans+Mono" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/ca_style.css">
+    <link rel="stylesheet" type="text/css" href="/jslib/dojo/1.10.4/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" type="text/css"
+	  href="calibrator_database.css">
+    <title>ATCA Calibrator Database</title>
+  </head>
+  <body class="claro">
+    <!--#include virtual="/includefiles/ca_header.html" -->  
+    <div class="caldb">
+
+      <div class="invisible" id="quickLinks">
+	<h3>Quick Links</h3>
+	<div class="inside">
+	  <table id="pageQuickLinks">
+	    <tr>
+	      <td><a href="#sourceInformation">Source Information</a></td>
+	      <td><a href="#sourceNotes">Notes</a></td>
+	      <td><a href="#fluxMeasurements">Flux Density Measurements</a></td>
+	    </tr>
+	  </table>
+	</div>
+      </div>
+
+      <h1>ATCA Calibrator Database v3</h1>
+
+      <div class="backToFront"><a href="calibrator_database.html">Back to front page</a></div>
+      <div class="showDetailed"><a href="" id="moreDetailLink">Show observation details</a></div>
+
+      <h2 id="calibratorName"></h2>
+
+      <div id="sourceInformation" class="invisible">
+	<a name="sourceInformation"></a>
+	<div class="title-help">
+	  <a href="calibrator_database_documentation.html#view-page-source-information"
+	     target="documentation" class="help-icon">what is this?</a>
+	</div>
+	<h3>Source Information</h3>
+	<div class="inside">
+	  <div class="inside-left">
+	    <table class="calibratorInfo">
+	      <tr><th>RA, Dec (J2000):</th><td id="calibratorPosition"></td></tr>
+	      <tr><th>ATCA Rise/Set LST:</th><td id="calibratorRiseSet"></td></tr>
+	    </table>
+	    <table class="multiwavelength">
+	      <caption>Images/References</caption>
+	      <tr id="imageRow"></tr>
+	    </table>
+	  </div>
+	  <div class="inside-right">
+	    <table class="calibratorInfo">
+	      <tr><th>Catalogue:</th><td id="calibratorCatalogue"></td></tr>
+	      <tr><th>Position Uncertainty:</th><td id="calibratorPositionUncertainty"></td></tr>
+	      <tr><th>Position Reference:</th><td id="calibratorReference"></td></tr>
+	    </table>
+	  </div>
+	  <div class="inside-break">&nbsp;</div>
+	</div>
+      </div>
+
+      <div id="sourceNotes" class="invisible">
+	<a name="sourceNotes"></a>
+	<div class="title-help">
+	  <a href="calibrator_database_documentation.html#view-page-source-notes"
+	     target="documentation" class="help-icon">what is this?</a>
+	</div>
+	<h3>Notes</h3>
+	<div class="inside">
+	  <div id="sourceNotesArea">
+	  </div>
+	  <div id="warning16cm">
+	    <b>Warning for 16cm observers:</b> A typical 16cm field will contain a
+	    100 mJy confusing source. In very compact arrays, 300 mJy of confusing
+	    flux is common on the shortest spacings. At 16cm, calibrators
+	    stronger than 5 Jy are recommended for ATCA arrays shorter than 375m.
+	  </div>
+	</div>
+      </div>
+
+      <div id="fluxMeasurements" class="invisible">
+	<a name="fluxMeasurements"></a>
+	<div class="title-help">
+	  <a href="calibrator_database_documentation.html#view-page-flux-density-measurements"
+	     target="documentation" class="help-icon">what is this?</a>
+	</div>
+	<h3>Flux Density Measurements</h3>
+	<div class="inside">
+	  <table class="fluxDensities">
+	    <thead>
+	      <tr><th>Band</th><th>Frequency</th><th>Date</th>
+		<th>Flux Density <a href="calibrator_database_documentation.html#interpreting-flux-densities"
+			    target="documentation" class="help-icon">(?)</a></th>
+		<th colspan="4">Defect / Closure Phase
+		  <a href="calibrator_database_documentation.html#interpreting-defects"
+		     target="documentation" class="help-icon">(?)</a></th></tr>
+	      <tr><th></th><th>(MHz)</th><th>(UTC)</th>
+		<th>(Jy)</th><th>6km</th><th>1.5km</th><th>750m</th><th>&lt;375m</th></tr>
+	    </thead>
+	    <tbody>
+	      <tr><th rowspan="1" id="fluxMeasurements16cm">16cm</th>
+		<th>2100</th><td id="calibratorTime2100">N/A</td><td id="calibratorFlux2100">N/A</td>
+		<td class="invisible" rowspan="1" id="calibratorQuality6000-16cm">
+		  <span id="calibratorDefect6000-16cm"></span> /
+		  <span id="calibratorClosure6000-16cm"></span>
+		</td>
+		<td class="invisible" rowspan="1" id="calibratorQuality1500-16cm">
+		  <span id="calibratorDefect1500-16cm"></span> /
+		  <span id="calibratorClosure1500-16cm"></span>
+		</td>
+		<td class="invisible" rowspan="1" id="calibratorQuality750-16cm">
+		  <span id="calibratorDefect750-16cm"></span> /
+		  <span id="calibratorClosure750-16cm"></span>
+		</td>
+		<td class="invisible" rowspan="1" id="calibratorQuality375-16cm">
+		  <span id="calibratorDefect375-16cm"></span> /
+		  <span id="calibratorClosure375-16cm"></span>
+		</td>
+	      </tr>
+	      <tr><th rowspan="2" id="fluxMeasurements4cm">4cm</th>
+		<th>5500</th><td id="calibratorTime5500">N/A</td><td id="calibratorFlux5500">N/A</td>
+		<td rowspan="2" class="invisible" id="calibratorQuality6000-4cm">
+		  <span id="calibratorDefect6000-4cm"></span> /
+		  <span id="calibratorClosure6000-4cm"></span>
+		</td>
+		<td rowspan="2" class="invisible" id="calibratorQuality1500-4cm">
+		  <span id="calibratorDefect1500-4cm"></span> /
+		  <span id="calibratorClosure1500-4cm"></span>
+		</td>
+		<td rowspan="2" class="invisible" id="calibratorQuality750-4cm">
+		  <span id="calibratorDefect750-4cm"></span> /
+		  <span id="calibratorClosure750-4cm"></span>
+		</td>
+		<td rowspan="2" class="invisible" id="calibratorQuality375-4cm">
+		  <span id="calibratorDefect375-4cm"></span> /
+		  <span id="calibratorClosure375-4cm"></span>
+		</td>
+	      </tr>
+	      <tr><th>9000</th><td id="calibratorTime9000">N/A</td><td id="calibratorFlux9000">N/A</td>
+	      <tr><th rowspan="1" id="fluxMeasurements15mm">15mm</th>
+		<th>17000</th><td id="calibratorTime17000">N/A</td><td id="calibratorFlux17000">N/A</td>
+		<td class="invisible" rowspan="1" id="calibratorQuality6000-15mm">
+		  <span id="calibratorDefect6000-15mm"></span> /
+		  <span id="calibratorClosure6000-15mm"></span>
+		</td>
+		<td class="invisible" rowspan="1" id="calibratorQuality1500-15mm">
+		  <span id="calibratorDefect1500-15mm"></span> /
+		  <span id="calibratorClosure1500-15mm"></span>
+		</td>
+		<td class="invisible" rowspan="1" id="calibratorQuality750-15mm">
+		  <span id="calibratorDefect750-15mm"></span> /
+		  <span id="calibratorClosure750-15mm"></span>
+		</td>
+		<td class="invisible" rowspan="1" id="calibratorQuality375-15mm">
+		  <span id="calibratorDefect375-15mm"></span> /
+		  <span id="calibratorClosure375-15mm"></span>
+		</td>
+	      </tr>
+	      <tr><th rowspan="1" id="fluxMeasurements7mm">7mm</th>
+		<th>33000</th><td id="calibratorTime33000">N/A</td><td id="calibratorFlux33000">N/A</td>
+		<td class="invisible" rowspan="1" id="calibratorQuality6000-7mm">
+		  <span id="calibratorDefect6000-7mm"></span> /
+		  <span id="calibratorClosure6000-7mm"></span>
+		</td>
+		<td class="invisible" rowspan="1" id="calibratorQuality1500-7mm">
+		  <span id="calibratorDefect1500-7mm"></span> /
+		  <span id="calibratorClosure1500-7mm"></span>
+		</td>
+		<td class="invisible" rowspan="1" id="calibratorQuality750-7mm">
+		  <span id="calibratorDefect750-7mm"></span> /
+		  <span id="calibratorClosure750-7mm"></span>
+		</td>
+		<td class="invisible" rowspan="1" id="calibratorQuality375-7mm">
+		  <span id="calibratorDefect375-7mm"></span> /
+		  <span id="calibratorClosure375-7mm"></span>
+		</td>
+	      </tr>
+	      <tr><th rowspan="1" id="fluxMeasurements3mm">3mm</th>
+		<th>93000</th><td id="calibratorTime93000">N/A</td><td id="calibratorFlux93000">N/A</td>
+		<td class="invisible" rowspan="1" id="calibratorQuality6000-3mm">
+		  <span id="calibratorDefect6000-3mm"></span> /
+		  <span id="calibratorClosure6000-3mm"></span>
+		</td>
+		<td class="invisible" rowspan="1" id="calibratorQuality1500-3mm">
+		  <span id="calibratorDefect1500-3mm"></span> /
+		  <span id="calibratorClosure1500-3mm"></span>
+		</td>
+		<td class="invisible" rowspan="1" id="calibratorQuality750-3mm">
+		  <span id="calibratorDefect750-3mm"></span> /
+		  <span id="calibratorClosure750-3mm"></span>
+		</td>
+		<td class="invisible" rowspan="1" id="calibratorQuality375-3mm">
+		  <span id="calibratorDefect375-3mm"></span> /
+		  <span id="calibratorClosure375-3mm"></span>
+		</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	</div>
+      </div>
+
+      <div id="measurementDetails" class="invisible hidden">
+	<a name="measurementDetails"></a>
+	<div class="title-help">
+	  <a href="calibrator_database_documentation.html#view-page-measurement-details"
+	     target="documentation" class="help-icon">what is this?</a>
+	</div>
+	<h3>Measurement Details</h3>
+	<div class="inside">
+	  <table class="detailsTable" id="detailsSummaryTable">
+	    <caption>Summary of observation epochs</caption>
+	    <tr><th>Epoch</th><th>Project</th>
+	      <th>Array</th><th>Band</th><th>Frequencies (MHz)</th>
+	      <th>R.A.</th><th>Dec.</th></tr>
+	  </table>
+	  <table class="detailsTable" id="detailsMeasurements">
+	    <caption>Epoch Measurements</caption>
+	    <thead>
+	      <tr><th>Epoch</th><th>Fit Coeff.</th><th>Log Fit</th>
+		<th>Defect</th><th>Frequency</th><th>Flux Density (Jy)</th>
+		<th>Spectral Index</th><th>Closure Phase</th></tr>
+	    </thead>
+	  </table>
+	  <table class="detailsTable" id="detailsStatistics">
+	    <caption>Measurement Statistics</caption>
+	    <tr><th>Band</th><th>Frequency</th><th>Mean Flux Density (Jy)</th>
+	      <th>Max / Min Pct. of Mean</th></tr>
+	  </table>
+	</div>
+      </div> <!-- measurementDetails -->
+
+      <div id="vlaInfo" class="invisible hidden">
+	<a name="vlaInfo"></a>
+	<div class="title-help">
+	  <a href="calibrator_database_documentation.html#interpreting-vla-information"
+	     target="documentation" class="help-icon">what is this?</a>
+	</div>
+	<h3>VLA Calibrator Information</h3>
+	<div class="inside">
+	  <div id="vla-calibrator-area">
+	    <pre>IAU NAME EQUINOX  PC RA(hh,mm,ss)    DEC(ddd,mm,ss)   POS.REF ALT.NAME
+===================================================================</pre>
+	  </div>
+	</div>
+      </div>
+
+      <div id="fluxTimeSeries" class="invisible">
+	<a name="fluxTimeSeries"></a>
+	<div class="title-help">
+	  <a href="calibrator_database_documentation.html#view-page-flux-density-time-series"
+	     target="documentation" class="help-icon">what is this?</a>
+	</div>
+	<h3>Flux Density Time Series</h3>
+	<div class="inside">
+	  <div id="time-series-buttons">
+	    <table class="bandButtons">
+	      <tr><th>Show:</th>
+		<td><button type="button" class="button16cm" disabled
+			    id="timeSeriesShow16cm">2100</button></td>
+		<td><button type="button" class="button4cm" disabled
+			    id="timeSeriesShow4cm">5500</button></td>
+		<td><button type="button" class="button15mm" disabled
+			    id="timeSeriesShow15mm">17000</button></td>
+		<td><button type="button" class="button7mm" disabled
+			    id="timeSeriesShow7mm">33000</button></td>
+		<td><button type="button" class="button3mm" disabled
+			    id="timeSeriesShow3mm">93000</button></td>
+	      </tr>
+	    </table>
+	  </div>
+	  <div id="time-series-plot-area"></div>
+	</div>
+      </div>
+
+      <div id="spectralIndexTimeSeries" class="invisible">
+	<a name="spectralIndexTimeSeries"></a>
+	<div class="title-help">
+	  <a href="calibrator_database_documentation.html#view-page-spectral-index-time-series"
+	     target="documentation" class="help-icon">what is this?</a>
+	</div>
+	<h3>Spectral Index Time Series</h3>
+	<div class="inside">
+	  <div id="time-series-buttons">
+	    <table class="bandButtons">
+	      <tr><th>Show:</th>
+		<td><button type="button" class="button16cm" disabled
+			    id="spectralIndexShow16cm">2100</button></td>
+		<td><button type="button" class="button4cm" disabled
+			    id="spectralIndexShow4cm">5500</button></td>
+		<td><button type="button" class="button15mm" disabled
+			    id="spectralIndexShow15mm">17000</button></td>
+		<td><button type="button" class="button7mm" disabled
+			    id="spectralIndexShow7mm">33000</button></td>
+		<td><button type="button" class="button3mm" disabled
+			    id="spectralIndexShow3mm">93000</button></td>
+	      </tr>
+	    </table>
+	  </div>
+	  <div id="spectral-index-plot-area"></div>
+	</div>
+      </div>
+
+      <div id="fluxModel" class="invisible">
+	<a name="fluxModel"></a>
+	<div class="title-help">
+	  <a href="calibrator_database_documentation.html#view-page-flux-model"
+	     target="documentation" class="help-icon">what is this?</a>
+	</div>
+	<h3>Flux Model</h3>
+	<div class="inside">
+	  <div id="time-series-buttons">
+	    <table class="bandButtons">
+	      <tr><th>Show:</th>
+		<td><button type="button" class="button16cm" disabled
+			    id="fluxModelShow16cm">16cm</button></td>
+		<td><button type="button" class="button4cm" disabled
+			    id="fluxModelShow4cm">4cm</button></td>
+		<td><button type="button" class="button15mm" disabled
+			    id="fluxModelShow15mm">15mm</button></td>
+		<td><button type="button" class="button7mm" disabled
+			    id="fluxModelShow7mm">7mm</button></td>
+		<td><button type="button" class="button3mm" disabled
+			    id="fluxModelShow3mm">3mm</button></td>
+	      </tr>
+	    </table>
+	  </div>
+	  <div id="flux-model-plot-area"></div>
+	</div>
+      </div>
+
+      <div id="uvResiduals" class="invisible">
+	<a name="uvResiduals"></a>
+	<div class="title-help">
+	  <a href="calibrator_database_documentation.html#view-page-structure-plot"
+	     target="documentation" class="help-icon">what is this?</a>
+	</div>
+	<h3>Structure Plot</h3>
+	<div class="inside">
+	  <div id="time-series-buttons">
+	    <table class="bandButtons">
+	      <tr><th>Show:</th>
+		<td><button type="button" class="button16cm" disabled
+			    id="uvResidualShow16cm">16cm</button></td>
+		<td><button type="button" class="button4cm" disabled
+			    id="uvResidualShow4cm">4cm</button></td>
+		<td><button type="button" class="button15mm" disabled
+			    id="uvResidualShow15mm">15mm</button></td>
+		<td><button type="button" class="button7mm" disabled
+			    id="uvResidualShow7mm">7mm</button></td>
+		<td><button type="button" class="button3mm" disabled
+			    id="uvResidualShow3mm">3mm</button></td>
+	      </tr>
+	    </table>
+	  </div>
+	  <div id="uv-residual-plot-area"></div>
+	</div>
+      </div>
+      
+    </div>
+    <div class="pagefooter">
+      <!--#include virtual="/includefiles/ca_footer.html" -->
+    </div>
+
+    <script src="/jslib/dojo/configure_dev.js"></script>
+    <script src="/jslib/dojo/1.10.4/dojo/dojo.js"></script>
+    <script src="calibrator_database_viewcal.js"></script>
+
+  </body>
+</html>

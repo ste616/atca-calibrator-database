@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link rel="stylesheet" type="text/css"
+          href="http://yui.yahooapis.com/3.4.1/build/cssreset/cssreset-min.css">
+    <link href="http://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/ca_style.css">
+    <link rel="stylesheet" type="text/css" href="/jslib/dojo/1.9.0/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" type="text/css"
+	  href="calibrator_database.css">
+    <script src="/jslib/dojo/configure.js"></script>
+    <script src="/jslib/dojo/1.9.0/dojo/dojo.js"></script>
+    <script src="calibrator_database_search.js"></script>
+    <title>ATCA Calibrator Database</title>
+  </head>
+  <body class="claro">
+    <!--#include virtual="/includefiles/ca_header.html" -->  
+    <div class="caldb">
+      <h1>ATCA Calibrator Database v3</h1>
+      <div class="backToFront"><a href="calibrator_database.html">Back to front page</a></div>
+
+      <div id="searchSummary"></div>
+
+      <div id="searchResults" class="invisible">
+	<div class="title-help">
+	  <a href="calibrator_database_documentation.html#search-page-search-results"
+	     target="documentation" class="help-icon">what is this?</a>
+	</div>
+	<h3>Search Results</h3>
+	<div class="inside">
+	  <div id="resultsTable" class="invisible">
+	    <table id="searchResultsTable">
+	    </table>
+	  </div>
+	  <div id="searchInProgress">
+	    Searching the database, please wait...
+	  </div>
+	</div>
+      </div>
+
+    </div>
+    <div class="pagefooter">
+      <!--#include virtual="/includefiles/ca_footer.html" -->
+    </div>
+  </body>
+</html>
