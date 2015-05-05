@@ -624,7 +624,7 @@ require([ "dojo/store/Memory", "dijit/form/FilteringSelect", "atnf/base", "dojo/
 		
 		// Start by making our plot area if we haven't already.
 		if (!plotsMade.timeSeries) {
-		    var minTime = '1993-01-01T00:00:00';
+		    var minTime = '2003-01-01T00:00:00';
 		    var maxTime = '2016-01-01T00:00:00';
 		    var minAtime = atnfTime.new({ 'utcString': minTime});
 		    var maxAtime = atnfTime.new({ 'utcString': maxTime});
@@ -649,7 +649,12 @@ require([ "dojo/store/Memory", "dijit/form/FilteringSelect", "atnf/base", "dojo/
 			'minorTickStep': 7.8894e9, // 1 quarter.
 			'labelFunc': function(text, value, precision) {
 			    var d = new Date(value);
-			    return d.getFullYear();
+			    var y = d.getFullYear();
+			    var m = d.getMonth();
+			    if (m > 0) {
+				y += 1;
+			    }
+			    return y;
 			}
 		    });
 		    plotsMade.siTimeSeries.addAxis('x', {
@@ -665,7 +670,12 @@ require([ "dojo/store/Memory", "dijit/form/FilteringSelect", "atnf/base", "dojo/
 			'minorTickStep': 7.8894e9, // 1 quarter.
 			'labelFunc': function(text, value, precision) {
 			    var d = new Date(value);
-			    return d.getFullYear();
+			    var y = d.getFullYear();
+			    var m = d.getMonth();
+			    if (m > 0) {
+				y += 1;
+			    }
+			    return y;
 			}
 		    });
 		    plotsMade.timeSeries.addAxis('y', {
