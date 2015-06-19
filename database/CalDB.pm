@@ -30,7 +30,7 @@ package CalDB::Measurement;
 use base 'CalDB::DBI';
 CalDB::Measurement->table('atca_caldb_measurement');
 CalDB::Measurement->columns(All => qw/meas_id source_name rightascension declination observation_mjd_start observation_mjd_end observation_mjd_integration frequency_band epoch_id band_fluxdensity band_fluxdensity_frequency public self_calibrated/);
-CalDB::Measurement->columns(TEMP => qw/fluxdensity_fit_coeff fluxdensity_fit_scatter kstest_d kstest_prob reduced_chisquare closures epochs fluxdensity_vector_averaged flux_id/);
+CalDB::Measurement->columns(TEMP => qw/fluxdensity_fit_coeff fluxdensity_fit_scatter kstest_d kstest_prob reduced_chisquare closures epochs fluxdensity_vector_averaged flux_id project_code array mjd_start f_first_channel f_channel_interval f_n_channels f_closure_phase_average f_closure_phase_measured_rms f_closure_phase_theoretical_rms fluxdensity_scalar_averaged phase_vector_averaged/);
 CalDB::Measurement->has_many(frequencies => 'CalDB::Frequency');
 CalDB::Measurement->has_many(fluxdensities => 'CalDB::FluxDensity');
 CalDB::Measurement->has_a(epoch_id => 'CalDB::Epoch');
@@ -73,6 +73,18 @@ CalDB::Measurement->set_sql(allfluxdensities => qq{
     RIGHT JOIN atca_caldb_fluxdensity ON (atca_caldb_fluxdensity.meas_id=atca_caldb_measurement.meas_id)
     WHERE public=1 
     ORDER by source_name,band_fluxdensity_frequency,observation_mjd_start
+});
+CalDB::Measurement->set_sql(allinformation => qq{
+    SELECT source_name,rightascension,declination,observation_mjd_start,observation_mjd_end,observation_mjd_integration,frequency_band,band_fluxdensity,band_fluxdensity_frequency,project_code,array,mjd_start,GROUP_CONCAT(frequency_first_channel) AS f_first_channel,GROUP_CONCAT(frequency_channel_interval) AS f_channel_interval,GROUP_CONCAT(n_channels) AS f_n_channels,GROUP_CONCAT(closure_phase_average) AS f_closure_phase_average,GROUP_CONCAT(closure_phase_measured_rms) AS f_closure_phase_measured_rms,GROUP_CONCAT(closure_phase_theoretical_rms) AS f_closure_phase_theoretical_rms,fluxdensity_vector_averaged,fluxdensity_scalar_averaged,fluxdensity_fit_coeff,fluxdensity_fit_scatter,phase_vector_averaged
+    FROM atca_caldb_measurement 
+    RIGHT JOIN atca_caldb_epoch ON (atca_caldb_measurement.epoch_id=atca_caldb_epoch.epoch_id)
+    RIGHT JOIN atca_caldb_frequency ON (atca_caldb_frequency.meas_id=atca_caldb_measurement.meas_id)
+    RIGHT JOIN atca_caldb_closure ON (atca_caldb_closure.freq_id=atca_caldb_frequency.freq_id)
+    RIGHT JOIN atca_caldb_fluxdensity ON (atca_caldb_fluxdensity.meas_id=atca_caldb_measurement.meas_id)
+    WHERE source_name=?
+    AND atca_caldb_measurement.public=1
+    GROUP BY atca_caldb_measurement.meas_id
+    ORDER BY observation_mjd_start
 });
 
 package CalDB::Change;

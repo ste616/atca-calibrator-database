@@ -244,65 +244,48 @@ sub get_all_source_details {
 	'source_name' => $source,
 	'measurements' => []
 	);
-    my $meas_iterator = CalDB::Measurement->search(
-	'source_name' => $source,
-	'public' => 1
-	);
-    while (my $meas = $meas_iterator->next) {
-
-	# Get the epoch.
-	my @epochs = CalDB::Epoch->search(
-	    'epoch_id' => $meas->epoch_id
-	    );
-
+    my @measurements = CalDB::Measurement->search_allinformation($source);
+    for (my $j = 0; $j <= $#measurements; $j++) {
+	my $meas = $measurements[$j];
+	# Fill our hash.
+	my @cs = split(/\,/, $meas->fluxdensity_fit_coeff);
+	
 	my %mres = (
 	    'rightascension' => $meas->rightascension,
 	    'declination' => $meas->declination,
 	    'integration' => $meas->observation_mjd_integration,
-	    'project_code' => $epochs[0]->project_code,
-	    'array' => $epochs[0]->array,
-	    'epoch_start' => $epochs[0]->mjd_start,
+	    'project_code' => $meas->project_code,
+	    'array' => $meas->array,
+	    'epoch_start' => $meas->mjd_start,
 	    'frequency_band' => $meas->frequency_band,
 	    'frequencies' => [],
-	    'fluxdensities' => []
+	    'fluxdensities' => [ {
+		'fluxdensity_vector_averaged' => $meas->fluxdensity_vector_averaged,
+		'fluxdensity_scalar_averaged' => $meas->fluxdensity_scalar_averaged,
+		'fluxdensity_fit_coeff' => \@cs,
+		'fluxdensity_fit_scatter' => $meas->fluxdensity_fit_scatter,
+		'phase_vector_averaged' => $meas->phase_vector_averaged
+				 } ]
 	    );
-	
-	# Go through the frequencies.
-	my $freq_iterator = $meas->frequencies();
-	while (my $freq = $freq_iterator->next) {
+	my @f_first_channels = split(/\,/, $meas->f_first_channel);
+	my @f_channel_intervals = split(/\,/, $meas->f_channel_interval);
+	my @f_n_channels = split(/\,/, $meas->f_n_channels);
+	my @f_closure_phase_averages = split(/\,/, $meas->f_closure_phase_average);
+	my @f_closure_phase_measured_rms = split(/\,/, $meas->f_closure_phase_measured_rms);
+	my @f_closure_phase_theoretical_rms = split(/\,/, $meas->f_closure_phase_theoretical_rms);
+	for (my $i = 0; $i <= $#f_first_channels; $i++) {
 	    my %fres = (
-		'frequency_first' => $freq->frequency_first_channel,
-		'frequency_interval' => $freq->frequency_channel_interval,
-		'nchans' => $freq->n_channels,
-		'closure_phases' => []
-		);
-	    
-	    # Go through the closure phases.
-	    my $clos_iterator = $freq->closurephases();
-	    while (my $clos = $clos_iterator->next) {
-		my %cres = (
-		    'closure_phase_average' => $clos->closure_phase_average,
-		    'closure_phase_measured_rms' => $clos->closure_phase_measured_rms,
-		    'closure_phase_theoretical_rms' => $clos->closure_phase_theoretical_rms
-		    );
-		push @{$fres{'closure_phases'}}, \%cres;
-	    }
+		'frequency_first' => $f_first_channels[$i],
+		'frequency_interval' => $f_channel_intervals[$i],
+		'nchans' => $f_n_channels[$i],
+		'closure_phases' => [ {
+		    'closure_phase_average' => $f_closure_phase_averages[$i],
+		    'closure_phase_measured_rms' => $f_closure_phase_measured_rms[$i],
+		    'closure_phase_theoretical_rms' => $f_closure_phase_theoretical_rms[$i]
+				      } ] );
 	    push @{$mres{'frequencies'}}, \%fres;
 	}
-
-	# Go through the flux densities.
-	my $flux_iterator = $meas->fluxdensities();
-	while (my $flux = $flux_iterator->next) {
-	    my @cs = split(/\,/, $flux->fluxdensity_fit_coeff);
-	    my %lres = (
-		'fluxdensity_vector_averaged' => $flux->fluxdensity_vector_averaged,
-		'fluxdensity_scalar_averaged' => $flux->fluxdensity_scalar_averaged,
-		'fluxdensity_fit_coeff' => \@cs,
-		'fluxdensity_fit_scatter' => $flux->fluxdensity_fit_scatter,
-		'phase_vector_averaged' => $flux->phase_vector_averaged
-		);
-	    push @{$mres{'fluxdensities'}}, \%lres;
-	}
+	
 	push @{$output{'measurements'}}, \%mres;
     }
 
