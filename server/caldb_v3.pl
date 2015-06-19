@@ -173,6 +173,17 @@ if ($action && $action eq 'info') {
 			$input{'flimit'}, $input{'frequencies'});
     print "</caltable>\n";
     exit;
+} elsif ($action && $action eq "source_band_nearest") {
+    if (!$input{'source'}) {
+	$output{'error'} = "No source specified.";
+    } elsif (!$input{'mjd'}) {
+	$output{'error'} = "No reference MJD specified.";
+    } elsif (!$input{'band'}) {
+	$output{'error'} = "No frequency band specified.";
+    } else {
+	%output = &get_date_flux_models($input{'source'}, $input{'mjd'}, 
+					$input{'band'});
+    }
 }
 
 
@@ -234,6 +245,52 @@ sub get_scheduler_info {
 	    }
 	}
     }
+}
+
+sub get_date_flux_models {
+    my $source = shift;
+    my $mjd = shift;
+    my $band = shift;
+
+    # Find the nearest flux density models for a source in a particular
+    # band. We will return the models measured before and after the MJD
+    # we are supplied.
+    
+    # Start by getting the flux density list.
+    my %output = (
+	'source_name' => $source,
+	'specified_mjd' => $mjd,
+	'frequency_band' => $band
+	);
+    my @models = CalDB::Measurement->search_sourceband_fluxmodels(( $source, $band ));
+    my $idx_before = -1;
+    my $idx_after = -1;
+    for (my $i = 0; $i <= $#models; $i++) {
+	if ($models[$i]->observation_mjd_start < $mjd) {
+	    $idx_before = $i;
+	} elsif ($idx_after == -1) {
+	    $idx_after = $i;
+	    last;
+	}
+    }
+    if ($idx_before >= 0) {
+	my @cs = split(/\,/, $models[$idx_before]->fluxdensity_fit_coeff);
+	$output{'fluxdensity_model_before'} = {
+	    'mjd_start' => $models[$idx_before]->observation_mjd_start,
+	    'integration' => $models[$idx_before]->observation_mjd_integration,
+	    'fluxdensity_fit_coeff' => \@cs
+	};
+    }
+    if ($idx_after >= 0) {
+	my @cs = split(/\,/, $models[$idx_after]->fluxdensity_fit_coeff);
+	$output{'fluxdensity_model_after'} = {
+	    'mjd_start' => $models[$idx_after]->observation_mjd_start,
+	    'integration' => $models[$idx_after]->observation_mjd_integration,
+	    'fluxdensity_fit_coeff' => \@cs
+	};
+    }
+
+    return %output;
 }
 
 sub get_all_source_details {

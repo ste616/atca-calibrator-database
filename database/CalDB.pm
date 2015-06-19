@@ -74,6 +74,15 @@ CalDB::Measurement->set_sql(allfluxdensities => qq{
     WHERE public=1 
     ORDER by source_name,band_fluxdensity_frequency,observation_mjd_start
 });
+CalDB::Measurement->set_sql(sourceband_fluxmodels => qq{
+    SELECT source_name,rightascension,declination,observation_mjd_start,observation_mjd_end,observation_mjd_integration,frequency_band,epoch_id,band_fluxdensity,band_fluxdensity_frequency,fluxdensity_fit_coeff
+    FROM atca_caldb_measurement
+    RIGHT JOIN atca_caldb_fluxdensity ON (atca_caldb_fluxdensity.meas_id=atca_caldb_measurement.meas_id)
+    WHERE source_name=?
+    AND frequency_band=?
+    AND public=1 
+    ORDER by observation_mjd_start
+});
 CalDB::Measurement->set_sql(allinformation => qq{
     SELECT source_name,rightascension,declination,observation_mjd_start,observation_mjd_end,observation_mjd_integration,frequency_band,band_fluxdensity,band_fluxdensity_frequency,project_code,array,mjd_start,GROUP_CONCAT(frequency_first_channel) AS f_first_channel,GROUP_CONCAT(frequency_channel_interval) AS f_channel_interval,GROUP_CONCAT(n_channels) AS f_n_channels,GROUP_CONCAT(closure_phase_average) AS f_closure_phase_average,GROUP_CONCAT(closure_phase_measured_rms) AS f_closure_phase_measured_rms,GROUP_CONCAT(closure_phase_theoretical_rms) AS f_closure_phase_theoretical_rms,fluxdensity_vector_averaged,fluxdensity_scalar_averaged,fluxdensity_fit_coeff,fluxdensity_fit_scatter,phase_vector_averaged
     FROM atca_caldb_measurement 
