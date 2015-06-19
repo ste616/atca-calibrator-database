@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link rel="stylesheet" type="text/css"
+          href="http://yui.yahooapis.com/3.4.1/build/cssreset/cssreset-min.css">
+    <link href="http://fonts.googleapis.com/css?family=Varela+Round|Droid+Sans+Mono" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/ca_style.css">
+    <link rel="stylesheet" type="text/css" href="/jslib/dojo/1.9.0/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" type="text/css"
+	  href="calibrator_database.css">
+    <script src="/jslib/dojo/configure.js"></script>
+    <script src="/jslib/dojo/1.9.0/dojo/dojo.js"></script>
+    <script src="calibrator_database.js"></script>
+    <title>ATCA Calibrator Database</title>
+  </head>
+  <body class="claro">
+    <!--#include virtual="/includefiles/ca_header.html" -->  
+    <div class="caldb">
+      <h1>ATCA Calibrator Database</h1>
+
+      <div id="versionMessage">
+	<div class="message">
+	  This is version 3 of the ATCA calibrator database.
+	</div>
+      </div>
+
+      <div id="recentChanges">
+	<div class="title-help">
+	  <a href="calibrator_database_documentation.html#front-page-recent-changes"
+	     target="documentation" class="help-icon">what is this?</a>
+	</div>
+	<h3>Recent database changes</h3>
+	<div class="inside">
+	  <table id="changeSummary">
+	    
+	  </table>
+	</div>
+	<div class="changeShow">
+	  <a href="calibrator_database_changes.html">show all changes and epochs</a>
+	</div>
+      </div>
+
+      <div id="quickFind">
+	<div class="title-help">
+	  <a href="calibrator_database_documentation.html#front-page-quick-find-calibrator"
+	     target="documentation" class="help-icon">what is this?</a>
+	</div>
+	<h3>Quick-find calibrator</h3>
+	<div class="inside">
+	  <div class="inside-left">
+	    <p>Enter the name of a calibrator in the input box below to
+	      get a small summary of its properties to the right.</p>
+	    
+	    <label for="calibratorQuickFind">Calibrator Name:</label>
+	    <input id="calibratorQuickFind" name="calibratorQuickFind">
+	  </div>
+	  <div class="inside-right invisible" id="quickSummary">
+	    <table class="calibratorInfo">
+	      <tr><th>Name:</th><td id="calibratorName"></td></tr>
+	      <tr><th>RA, Dec (J2000):</th><td id="calibratorPosition"></td></tr>
+	      <tr><th>ATCA Rise/Set LST:</th><td id="calibratorRiseSet"></td></tr>
+	      <tr><th>Catalogue:</th><td id="calibratorCatalogue"></td></tr>
+	    </table>
+	    <table class="calibratorFluxes">
+	      <thead>
+		<tr><th>Frequency (MHz)</th><th>Flux Density (Jy)
+		    <a href="calibrator_database_documentation.html#interpreting-flux-densities"
+		       target="documentation" class="help-icon">(?)</a></th></tr>
+	      </thead>
+	      <tbody>
+		<tr><th>2100</th><td id="calibratorFlux2100">N/A</td></tr>
+		<tr><th>5500</th><td id="calibratorFlux5500">N/A</td></tr>
+		<tr><th>9000</th><td id="calibratorFlux9000">N/A</td></tr>
+		<tr><th>17000</th><td id="calibratorFlux17000">N/A</td></tr>
+		<tr><th>33000</th><td id="calibratorFlux33000">N/A</td></tr>
+		<tr><th>93000</th><td id="calibratorFlux93000">N/A</td></tr>
+	      </tbody>
+	    </table>
+	    <div class="calibratorMoreInfo">
+	      <a href="" id="calibratorMoreInfo">more information...</a>
+	    </div>
+	  </div>
+	  <div class="inside-break">&nbsp;</div>
+	</div>
+      </div>
+     
+      <div id="search">
+	<div class="title-help">
+	  <a href="calibrator_database_documentation.html#front-page-search-for-calibrators"
+	     target="documentation" class="help-icon">what is this?</a>
+	</div>
+	<h3>Search for calibrators</h3>
+	<div class="inside">
+	  <div class="inside-left">
+	    <p>Here you can search for calibrators that you may find useful.</p>
+	    <p>To find calibrators within some distance of some position on the
+	      sky:
+	      <ul>
+		<li>Put a J2000 R.A. and Declination into the "Position" box to the right,
+		  or the name of a source that can be resolved by Simbad.</li>
+		<li>Specify a search radius in degrees in the "Radius" box.</li>
+	      </ul>
+	    </p>
+	    <p>To find calibrators within a bounding box defined by R.A. and
+	      Declination ranges:
+	      <ul>
+		<li>Put the low and high J2000 R.A. hours into the "R.A. Range"
+		  box to the right, separated by a comma; like "16,20" to search
+		  between 16 and 20 hours, or "22,2" to search between
+		  22 and 2 hours.</li>
+		<li>Put the low and high J2000 Declinations into the "Dec. Range"
+		  box to the right, separated by a comma; like "-20,10" to search
+		  between -20&deg; and 10&deg;.</li>
+	      </ul>
+	    </p>
+	    <p>If you wish to restrict the search to bright calibrators, specify your
+	      flux density limit and to which band it should apply.</p>
+	    <p>If you wish to restrict the search to calibrators that have a measurement,
+	      ensure that the "Measurements" box is ticked. If you also select
+	      a band, then only calibrators with a measurement in that band will be
+	      returned.</p>
+	    <p>Hit the
+	      "Search" button to find a list of matching calibrators, or the "Reset"
+	      button to clear the entry boxes to their default values.</p>
+	  </div>
+	  <div class="inside-right">
+	    <table class="searchParameters">
+	      <tr><th>Position:</th><td class="relativePosition">
+		  <input id="searchPosition" type="text" value="">
+		  <div id="positionResolving" class="positionOverlay invisible">resolving</div>
+		  <div id="resolveSuccess" class="positionOverlay invisible"></div>
+		  <div id="resolveFail" class="positionOverlay invisible">failed</div>
+	      </td></tr>
+	      <tr><th>Radius (deg):</th>
+		<td><input id="searchRadius" type="text"
+			   value="10" size="5"></td></tr>
+	      <tr><th>R.A. Range:</th>
+		<td><input id="searchRaRange" type="text" value="" size="10"></td></tr>
+	      <tr><th>Dec. Range:</th>
+		<td><input id="searchDecRange" type="text" value="" size="10"></td></tr>
+	      <tr><th>Flux Limit (Jy):</th>
+		<td><input id="searchFluxLimit" type="text"
+			   value="" size="5"></td></tr>
+	      <tr><th>Band:</th>
+		<td>
+		  <input id="searchBand16cm" type="radio" name="searchBand" value="16cm">
+		  <label for="searchBand16cm">16cm</label>
+		  <input id="searchBand4cm" type="radio" name="searchBand" value="4cm">
+		  <label for="searchBand4cm">4cm</label>
+		  <input id="searchBand15mm" type="radio" name="searchBand" value="15mm">
+		  <label for="searchBand15mm">15mm</label>
+		  <input id="searchBand7mm" type="radio" name="searchBand" value="7mm">
+		  <label for="searchBand7mm">7mm</label>
+		  <input id="searchBand3mm" type="radio" name="searchBand" value="3mm">
+		  <label for="searchBand3mm">3mm</label>
+		</td>
+	      </tr>
+	      <tr><th>Measurements:</th>
+		<td><input type="checkbox" id="measurementsRequired" value="yes"></td>
+	      </tr>
+	    </table>
+	    <button class="halfButton" id="searchButton" type="button">Search</button>
+	    <button class="halfButton" id="resetButton" type="button">Reset</button>
+	  </div>
+	  <div class="inside-break">&nbsp;</div>
+	</div>
+      </div>
+      
+    </div>
+    <div class="pagefooter">
+      <!--#include virtual="/includefiles/ca_footer.html" -->
+    </div>
+
+    <div class="md-modal md-effect-1" id="modal-error-search">
+      <div class="md-content">
+	<h3>Unrestricted Search</h3>
+	<div>
+	  <p>You have not entered enough valid information to properly
+	    restrict the search for calibrators with regards to position.</p>
+	  <p>Are you sure you want to continue searching without positional
+	    restrictions?</p>
+	  <button class="md-close" id="position-unrestricted">Yes</button>
+	  <button class="md-close" id="position-restricted">No</button>
+	  <div class="inside-break">&nbsp;</div>
+	</div>
+      </div>
+    </div><!-- #modal-error-zoomfreq -->
+
+  </body>
+</html>
