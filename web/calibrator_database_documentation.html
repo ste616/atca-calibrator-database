@@ -1048,6 +1048,59 @@ Key: flux
 	  </div>
 	</div> <!-- View Page: Flux Density Request -->
 	<div>
+	  <a name="view-page-measurement-details">&nbsp;</a>
+	  <h3>View Page: Measurement Details</h3>
+	  <img src="view-page-observation-details.png">
+	  <div>
+	    To get a complete view of all the measurements that have been made of the
+	    source you're viewing, you can click on the "Show observation details"
+	    link at the top of the page, between the "ATCA Calibrator Database v3"
+	    title and the name of the source, as shown above. If you click this link,
+	    the page will reload, and after a short time you will get an additional
+	    panel - "Measurement Details" - which looks something like the image below.
+	  </div>
+	  <img src="view-page-measurement-details-1.png">
+	  <div>
+	    The top part of the measurement details panel shows a summary of all the
+	    observation epochs. A single line in the observation table will show the UTC
+	    date of the observation epoch, and the project code that observed this source
+	    on that date, along with the array configuration. Each line will only show a
+	    single frequency band, so if more than one band is observed for this source on
+	    a single date, you will see two lines with the same date. The central
+	    frequencies (in MHz) that were observed are shown, along with the R.A. and Dec.
+	    of the phase centre.
+	  </div>
+	  <div>
+	    After the observation table, you will see the "Epoch Measurements" table, which
+	    looks something like the image below.
+	  </div>
+	  <img src="view-page-measurement-details-2.png">
+	  <div>
+	    The measurements table is separated into frequency bands, so all the 16cm band
+	    observations are grouped together, as are 4cm observations, etc. In each band
+	    section, the individual measurements are listed in time order.
+	  </div>
+	  <div>
+	    For each measurement, the observation epoch date is shown, and the linear
+	    fit coefficients (see <a href="#measurement-process-flux-model">here</a>) are
+	    given, as is an indicator of whether the coefficients refer to a log-space fit.
+	    For each of the central frequencies that were observed for this measurement,
+	    the flux density (in Jy) and the spectral index at that frequency is shown.
+	    The closure phase measured in that band is also given.
+	  </div>
+	  <div>
+	    Below this table is the "Measurement Statistics" table, as shown below.
+	  </div>
+	  <img src="view-page-measurement-details-3.png">
+	  <div>
+	    In this table, for each band and recommended frequency, the mean of all the
+	    measured flux densities is calculated and shown. The variation of all the
+	    measurements away from this mean is then calculated and shown as a minimum
+	    and maximum percentage of the mean value. This can be used as a good estimate
+	    of the variation of this source over time.
+	  </div>
+	</div> <!-- View Page: Measurement Details -->
+	<div>
 	  <a name="view-page-flux-density-time-series">&nbsp;</a>
 	  <h3>View Page: Flux Density Time Series</h3>
 	  <img src="view-page-flux-density-time-series.png">
