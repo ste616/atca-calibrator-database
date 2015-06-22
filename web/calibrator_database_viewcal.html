@@ -23,6 +23,7 @@
 	      <td><a href="#sourceInformation">Source Information</a></td>
 	      <td><a href="#sourceNotes">Notes</a></td>
 	      <td><a href="#fluxMeasurements">Flux Density Measurements</a></td>
+	      <td><a href="#fluxRequest">Flux Density Request</a></td>
 	    </tr>
 	  </table>
 	</div>
@@ -197,6 +198,84 @@
 		<td class="invisible" rowspan="1" id="calibratorQuality375-3mm">
 		  <span id="calibratorDefect375-3mm"></span> /
 		  <span id="calibratorClosure375-3mm"></span>
+		</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	</div>
+      </div>
+
+      <div id="fluxRequest" class="invisible">
+	<a name="fluxRequest"></a>
+	<div class="title-help">
+	  <a href="calibrator_database_documentation.html#view-page-flux-density-request"
+	     target="documentation" class="help-icon">what is this?</a>
+	</div>
+	<h3>Flux Density Request</h3>
+	<div class="inside">
+	  <table class="fluxRequestInput">
+	    <tr><th rowspan="2">Flux density at</th>
+	      <td rowspan="2"><input type="text" size="5" maxlength="4" id="request_year" value="2015" placeholder="year">
+		<label for="request_year">/</label><input type="text" size="3" maxlength="2" id="request_month" value="01" placeholder="mm">
+		<label for="request_month">/</label><input type="text" size="3" maxlength="2" id="request_day" value="01" placeholder="dd"></td>
+	      <td><input type="radio" name="request_type" checked value="band"><label for="request_type">at</label>
+		<input type="radio" name="request_band" checked value="16cm"><label for="request_band">16cm</label>
+		<input type="radio" name="request_band" value="4cm"><label for="request_band">4cm</label>
+		<input type="radio" name="request_band" value="15mm"><label for="request_band">15mm</label>
+		<input type="radio" name="request_band" value="7mm"><label for="request_band">7mm</label>
+		<input type="radio" name="request_band" value="3mm"><label for="request_band">3mm</label></td>
+	      <td rowspan="2"><button type="button" id="request_submit">Submit</button></td>
+	    </tr>
+	    <tr><td><input type="radio" name="request_type" value="frequency"><label for="request_band">at</label>
+		<input type="text" id="request_frequency" value="2100" placeholder="freq" size="7" maxlength="6">
+		<label for="request_frequency">MHz</label></td></tr>
+	  </table>
+	  <table id="fluxRequestResults" class="fluxRequestResults invisible hidden">
+	    <thead>
+	      <tr><th>Date</th>
+		<th colspan="4">Flux Density</th>
+		<th>Spectral Index</th>
+	      </tr>
+	      <tr><th>(UTC)</th>
+		<th>Model Coeff.</th>
+		<th>Log Fit</th>
+		<th>@ <span id="fluxRequestFlux_frequency"></span> MHz (Jy)</th>
+		<th>Scatter (Jy)</th>
+		<th>@ <span id="fluxRequestSI_frequency"></span> MHz</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr id="fluxRequest_no_before" class="hidden">
+		<th class="errorRow" colspan="6">No measurement found before requested date</th>
+	      </tr>
+	      <tr id="fluxRequest_row_before" class="hidden">
+		<th id="fluxRequest_date_before"></td>
+		<td id="fluxRequest_model_before"></td>
+		<td id="fluxRequest_log_before"></td>
+		<td id="fluxRequest_fluxDensity_before"></td>
+		<td id="fluxRequest_fluxScatter_before"></td>
+		<td id="fluxRequest_spectralIndex_before"></td></tr>
+	      <tr>
+		<th id="fluxRequest_date_supplied"></th>
+		<td colspan="5">Your requested date</td>
+	      </tr>
+	      <tr id="fluxRequest_row_after" class="hidden">
+		<th id="fluxRequest_date_after"></td>
+		<td id="fluxRequest_model_after"></td>
+		<td id="fluxRequest_log_after"></td>
+		<td id="fluxRequest_fluxDensity_after"></td>
+		<td id="fluxRequest_fluxScatter_after"></td>
+		<td id="fluxRequest_spectralIndex_after"></td></tr>
+	      <tr id="fluxRequest_no_after" class="hidden">
+		<th class="errorRow" colspan="6">No measurement found after requested date</th>
+	      </tr>
+	      <tr id="fluxRequest_model_show">
+		<td colspan="6">
+		  <label for="flux_coefficients">Show Coefficients:</label>
+		  <input type="radio" name="flux_coefficients" checked value="linear">
+		  <label for="flux_coefficients">Linear Fit</label>
+		  <input type="radio" name="flux_coefficients" value="alpha">
+		  <label for="flux_coefficients">mfflux compatible</label>
 		</td>
 	      </tr>
 	    </tbody>

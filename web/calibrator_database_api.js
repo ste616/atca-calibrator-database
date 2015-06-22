@@ -363,6 +363,36 @@ define([ "dojo/request/xhr", "dojo/_base/lang", "atnf/base", "atnf/angle",
 	       });
 	   };
 
+	   // Get the flux models near a requested date in the requested band.
+	   rObj.nearestModels = function(calibratorName, mjd, frequencyBand) {
+	       return _comms({
+		   'action': "source_band_nearest",
+		   'source': calibratorName,
+		   'mjd': mjd,
+		   'band': frequencyBand
+	       }).then(function(data) {
+		   // Massage the returned data.
+		   if (typeof data !== 'undefined') {
+		       if (typeof data.specified_mjd !== 'undefined') {
+			   data.queryTime = atnfTime.new({
+			       'mjd': parseFloat(data.specified_mjd)
+			   });
+		       }
+		       if (typeof data.fluxdensity_model_before !== 'undefined') {
+			   data.fluxdensity_model_before.time = atnfTime.new({
+			       'mjd': parseFloat(data.fluxdensity_model_before.mjd_start)
+			   });
+		       }
+		       if (typeof data.fluxdensity_model_after !== 'undefined') {
+			   data.fluxdensity_model_after.time = atnfTime.new({
+			       'mjd': parseFloat(data.fluxdensity_model_after.mjd_start)
+			   });
+		       }
+		   }
+		   return data;
+	       });
+	   };
+
 	   // Get the computed statistics for each epoch.
 	   rObj.projectStatistics = function(projectCode) {
 	       

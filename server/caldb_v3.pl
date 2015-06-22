@@ -278,7 +278,8 @@ sub get_date_flux_models {
 	$output{'fluxdensity_model_before'} = {
 	    'mjd_start' => $models[$idx_before]->observation_mjd_start,
 	    'integration' => $models[$idx_before]->observation_mjd_integration,
-	    'fluxdensity_fit_coeff' => \@cs
+	    'fluxdensity_fit_coeff' => \@cs,
+	    'fluxdensity_fit_scatter' => $models[$idx_before]->fluxdensity_fit_scatter
 	};
     }
     if ($idx_after >= 0) {
@@ -286,7 +287,8 @@ sub get_date_flux_models {
 	$output{'fluxdensity_model_after'} = {
 	    'mjd_start' => $models[$idx_after]->observation_mjd_start,
 	    'integration' => $models[$idx_after]->observation_mjd_integration,
-	    'fluxdensity_fit_coeff' => \@cs
+	    'fluxdensity_fit_coeff' => \@cs,
+	    'fluxdensity_fit_scatter' => $models[$idx_after]->fluxdensity_fit_scatter
 	};
     }
 

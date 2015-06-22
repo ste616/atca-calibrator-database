@@ -88,8 +88,8 @@ h2#calibratorName { font-size: 1.5em; padding: 1em 0 0.3em 0.5em; clear: left; }
 }
 
 /* Dark Forest sections. */
-#fluxMeasurements { margin-top: 1em; border: 2px solid #44693d; }
-#fluxMeasurements h3 {
+#fluxMeasurements, #fluxRequest { margin-top: 1em; border: 2px solid #44693d; }
+#fluxMeasurements h3, #fluxRequest h3 {
     margin: 0; color: white; font-weight: bold; padding: 0.2em;
     font-size: 1em; font-family: 'Varela Round', sans-serif; width: 50%; border-radius: 0 0 20px 0;
     background: #44693d; /* Old browsers */
@@ -513,3 +513,23 @@ tbody.measBody7mm th { background: #e87722; color: white; font-weight: bold;
 tbody.measBody3mm { background: rgba(109, 32, 119, 0.2); }
 tbody.measBody3mm th { background: #6d2077; color: white; font-weight: bold;
 		       text-align: left; padding-left: 2em; }
+
+table.fluxRequestInput {
+    width: 100%; border-collapse: collapse; border: 2px solid #555; }
+table.fluxRequestInput td {
+    padding: 0.3em; vertical-align: middle; }
+table.fluxRequestInput th {
+    padding: 0.3em; vertical-align: middle; font-weight: bold; }
+table.fluxRequestInput input[type="radio"] + label {
+    margin-right: 0.8em; margin-left: 0.2em; }
+
+.fluxRequestResults { border: 1px solid black; border-collapse: collapse; width: 100%; margin: 0.8em 0; }
+.fluxRequestResults > thead th { background: black; color: white; font-weight: bold; text-align: center;
+				 padding: 0.3em; }
+.fluxRequestResults th { background: #44693d; color: white; font-weight: bold; text-align: center;
+			 padding: 0.3em; border: 1px solid black; vertical-align: middle; }
+.fluxRequestResults td { padding: 0.3em; text-align: center; border: 1px dotted black; 
+			 vertical-align: middle; }
+.fluxRequestResults th.errorRow { background: red; color: yellow; }
+#fluxRequest_model_show > td { text-align: left; }
+#fluxRequest_model_show > td label { margin-left: 0.2em; margin-right: 0.8em; }

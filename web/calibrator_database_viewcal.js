@@ -3,7 +3,7 @@ require([ "dojo/store/Memory", "dijit/form/FilteringSelect", "atnf/base", "dojo/
 	  "dojo/fx", "dojo/_base/fx", "dojo/dom-class", "dojox/charting/Chart",
 	  "dojox/charting/SimpleTheme", "atnf/time", "dojo/on", "dojo/query",
 	  "dojo/dom-style", "dojo/_base/lang",
-	  "dojo/NodeList-traverse",
+	  "dojo/NodeList-traverse", "dojo/NodeList-dom",
 	  "dojox/charting/plot2d/Scatter", "dojox/charting/plot2d/Markers",
 	  "dojox/charting/plot2d/Lines", "dojox/charting/plot2d/Default",
 	  "dojox/charting/axis2d/Default", "dojo/domReady!"],
@@ -79,6 +79,23 @@ require([ "dojo/store/Memory", "dijit/form/FilteringSelect", "atnf/base", "dojo/
 			    return b;
 			}
 		    }
+		}
+		// Otherwise we return the band closest to the given
+		// frequency.
+		var minDiff = 1000000;
+		var minBand = '';
+		for (var b in bandRanges) {
+		    if (bandRanges.hasOwnProperty(b)) {
+			var bdiff = Math.abs(f - bandRanges[b].min);
+			var tdiff = Math.abs(f - bandRanges[b].max);
+			if (bdiff < minDiff || tdiff < minDiff) {
+			    minBand = b;
+			    minDiff = (bdiff < tdiff) ? bdiff : tdiff;
+			}
+		    }
+		}
+		if (minBand !== '') {
+		    return minBand;
 		}
 		// Not known.
 		return null;
@@ -509,6 +526,10 @@ require([ "dojo/store/Memory", "dijit/form/FilteringSelect", "atnf/base", "dojo/
 		    // have a valid calibrator.
 		    fx.fadeIn({
 			'node': dom.byId('fluxMeasurements'),
+			'duration': 500
+		    }).play();
+		    fx.fadeIn({
+			'node': dom.byId('fluxRequest'),
 			'duration': 500
 		    }).play();
 		    fx.fadeIn({
@@ -1190,6 +1211,148 @@ require([ "dojo/store/Memory", "dijit/form/FilteringSelect", "atnf/base", "dojo/
 		    }).play();
 		}
 	    };
+
+
+	    var requestedCoefficients = {
+		'before': null,
+		'after': null,
+		'referenceFrequency': null
+	    };
+
+	    var fillRequestTableCoefficients = function(row) {
+		if (requestedCoefficients[row] === null) {
+		    // No good.
+		    return;
+		}
+		var ctype = query('input[name="flux_coefficients"]:checked').attr('value')[0];
+		var fc = null;
+		var fl = null;
+		if (ctype === 'linear') {
+		    fc = lang.clone(requestedCoefficients[row]);
+		    fl = fc.splice(-1, 1);
+		    fl = (fl[0] === 'log') ? 'Y': 'N';
+		} else if (ctype === 'alpha') {
+		    var fh = [];
+		    fh.push(number.round(caldb.fluxModel2Density(requestedCoefficients[row],
+								 requestedCoefficients.referenceFrequency), 4));
+		    fh.push(number.round((requestedCoefficients.referenceFrequency / 1000), 3));
+		    fc = caldb.fluxModel2Alphas(requestedCoefficients[row],
+						requestedCoefficients.referenceFrequency, true);
+		    if (typeof fc === 'undefined') {
+			// Mustn't have had a log model.
+			fc = [ "Not computable" ];
+			fl = "N";
+		    } else {
+			fc = fc.map(function(v) {
+			    return number.round(v, 4);
+			});
+			fh.push(fc);
+			fc = fh;
+			fl = "Y";
+		    }
+		}
+		domAttr.set('fluxRequest_model_' + row, 'innerHTML',
+			    fc.join(','));
+		domAttr.set('fluxRequest_log_' + row, 'innerHTML', fl);
+	    };
+
+	    on(dom.byId('fluxRequest_model_show'), 'click', function(e) {
+		fillRequestTableCoefficients('before');
+		fillRequestTableCoefficients('after');
+	    });
+
+	    var fillRequestTable = function(row, data, frequency) {
+		domAttr.set('fluxRequest_date_' + row, 'innerHTML',
+			    data.time.timeString('%y-%m-%d'));
+		fillRequestTableCoefficients(row);
+		domAttr.set('fluxRequest_fluxScatter_' + row, 'innerHTML',
+			    number.round(data.fluxdensity_fit_scatter, 3));
+		// Evaluate our model at the requested frequency.
+		var mflux = number.round(
+		    caldb.fluxModel2Density(data.fluxdensity_fit_coeff,
+					    frequency), 3);
+		domAttr.set('fluxRequest_fluxDensity_' + row, 'innerHTML', mflux);
+		var msi = number.round(
+		    caldb.fluxModel2Slope(data.fluxdensity_fit_coeff, frequency), 3);
+		domAttr.set('fluxRequest_spectralIndex_' + row, 'innerHTML', msi);
+	    };
+
+	    // The routine that gets the flux density models either side of a requested date.
+	    var getFluxDensityRequest = function(e) {
+		// Get the MJD for the request.
+		var yyyy = domAttr.get('request_year', 'value');
+		var mm = domAttr.get('request_month', 'value');
+		var dd = domAttr.get('request_day', 'value');
+		var ustring = yyyy + '-' + mm + '-' + dd + 'T00:00:00';
+		var utime = atnfTime.new({ 'utcString': ustring });
+		var umjd = utime.mjd();
+		
+		// Get the bandname to search in.
+		var rtype = query('input[name="request_type"]:checked').attr('value');
+		var rband = query('input[name="request_band"]:checked').attr('value')[0];
+		var rfreq = 0;
+		if (rtype[0] === 'frequency') {
+		    // We have to convert the given frequency to a band name.
+		    rfreq = domAttr.get('request_frequency', 'value');
+		    rband = frequency2band(rfreq);
+		} else {
+		    // Get the recommended frequency for this band.
+		    rfreq = bandFrequencies[rband][0];
+		}
+		requestedCoefficients.referenceFrequency = parseFloat(rfreq);
+		
+		// Request the data.
+		caldb.nearestModels(pageOptions.source, umjd, rband).then(function(data) {
+		    if (typeof data === 'undefined') {
+			// No valid data.
+			return;
+		    }
+		    // Set the supplied date row.
+		    domAttr.set('fluxRequest_date_supplied', 'innerHTML',
+				data.queryTime.timeString('%y-%m-%d'));
+		    // And the frequency setting.
+		    domAttr.set('fluxRequestFlux_frequency', 'innerHTML', rfreq);
+		    domAttr.set('fluxRequestSI_frequency', 'innerHTML', rfreq);
+		    if (typeof data.fluxdensity_model_before !== 'undefined') {
+			// There was a result before our query time.
+			domClass.remove('fluxRequest_row_before', 'hidden');
+			// Hide the error row.
+			domClass.add('fluxRequest_no_before', 'hidden');
+			requestedCoefficients.before = data.fluxdensity_model_before.fluxdensity_fit_coeff;
+			fillRequestTable('before', data.fluxdensity_model_before, rfreq);
+		    } else {
+			// Hide the before row.
+			domClass.add('fluxRequest_row_before', 'hidden');
+			// Show the error row.
+			domClass.remove('fluxRequest_no_before', 'hidden');
+			requestedCoefficients.before = null;
+		    }
+		    if (typeof data.fluxdensity_model_after !== 'undefined') {
+			// There was a result after our query time.
+			domClass.remove('fluxRequest_row_after', 'hidden');
+			// Hide the error row.
+			domClass.add('fluxRequest_no_after', 'hidden');
+			requestedCoefficients.after = data.fluxdensity_model_after.fluxdensity_fit_coeff;
+			fillRequestTable('after', data.fluxdensity_model_after, rfreq);
+		    } else {
+			// Hide the after row.
+			domClass.add('fluxRequest_row_after', 'hidden');
+			// Show the error row.
+			domClass.remove('fluxRequest_no_after', 'hidden');
+			requestedCoefficients.after = null;
+		    }
+		    // Show the results table.
+		    domClass.remove('fluxRequestResults', 'hidden');
+		    fx.fadeIn({
+			'node': dom.byId('fluxRequestResults'),
+			'duration': 500
+		    }).play();
+		    
+		});
+		
+	    };
+	    on(dom.byId('request_submit'), 'click', getFluxDensityRequest);
+
 
 	    // Get the basic information straight away.
 	    caldb.getBasicInfo(pageOptions.source).then(showCalibratorSummary);

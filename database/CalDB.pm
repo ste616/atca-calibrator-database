@@ -75,7 +75,7 @@ CalDB::Measurement->set_sql(allfluxdensities => qq{
     ORDER by source_name,band_fluxdensity_frequency,observation_mjd_start
 });
 CalDB::Measurement->set_sql(sourceband_fluxmodels => qq{
-    SELECT source_name,rightascension,declination,observation_mjd_start,observation_mjd_end,observation_mjd_integration,frequency_band,epoch_id,band_fluxdensity,band_fluxdensity_frequency,fluxdensity_fit_coeff
+    SELECT source_name,rightascension,declination,observation_mjd_start,observation_mjd_end,observation_mjd_integration,frequency_band,epoch_id,band_fluxdensity,band_fluxdensity_frequency,fluxdensity_fit_coeff,fluxdensity_fit_scatter
     FROM atca_caldb_measurement
     RIGHT JOIN atca_caldb_fluxdensity ON (atca_caldb_fluxdensity.meas_id=atca_caldb_measurement.meas_id)
     WHERE source_name=?
