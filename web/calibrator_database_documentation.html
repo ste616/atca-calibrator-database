@@ -960,6 +960,94 @@ Antenna positions in local equatorial coordinates
 	  </div>
 	</div> <!-- View Page: Flux Density Measurements -->
 	<div>
+	  <a name="view-page-flux-density-request">&nbsp;</a>
+	  <h3>View Page: Flux Density Request</h3>
+	  <img src="view-page-flux-density-request.png">
+	  <div>
+	    If you need to know the flux density of the calibrator you're viewing on
+	    a particular date in a particular band (or at a particular frequency), you can
+	    use this request facility to get this information.
+	  </div>
+	  <div>
+	    To request the data, put the date of interest into the three input boxes on
+	    the left, with the year first, the month second, and the day of the month last.
+	    Then select the radio button for either the band you're interested in, or put
+	    a frequency (in MHz) into the frequency input box; make sure you've selected
+	    the correct "at" radio button as well. Once you've entered this information,
+	    press the "Submit" button on the right.
+	  </div>
+	  <div>
+	    Shortly after you've hit the "Submit" button, you should get a table that looks
+	    like the image below.
+	  </div>
+	  <img src="view-page-flux-density-request-complete.png">
+	  <div>
+	    You will get information about the measurements closest in time to the date
+	    you supplied, with one before, and one afterwards. For each measurement, the
+	    coefficients of the flux density model that was measured are displayed,
+	    along with an indicator of whether the flux density model was made using
+	    the log of the flux densities and frequencies.
+	  </div>
+	  <div>
+	    The flux density in Jy, evaluated at the frequency you supplied, or at the
+	    lowest recommended frequency in the band you requested, is also shown, along
+	    with the scatter around the fit as the uncertainty. Finally, the spectral
+	    index is shown, as evaluated at the same frequency as the flux density.
+	  </div>
+	  <div>
+	    At the bottom of the panel, you may select whether you want the coefficients
+	    of a linear fit, or as the input that would be able to be used as the "flux"
+	    parameter in the mfcal task. You can read more about the way the flux density
+	    models are made <a href="#measurement-process-flux-model">here</a>, in order
+	    to understand how to interpret these numbers. In the above example, the
+	    coefficients 7.217E-01,-2.338E-01,3.738E-01 should be interpreted as:
+	    <div class="equation">
+	      $\log({\rm S} / 1 {\rm\,Jy}) = 0.7217 - 0.2338\log(\nu / 1 {\rm\,GHz}) + 0.3738\log(\nu / 1 {\rm\,GHz})^2,$
+	    </div>
+	    where ${\rm S}$ is the flux density in Jy at the frequency $\nu$ in GHz.
+	  </div>
+	  <div>
+	    The Miriad tasks mfcal, mfboot and gpcal don't understand the linear fit models
+	    like that shown above. Instead, they use a spectral index and curvature system,
+	    defined such that:
+	    <div class="equation">
+	      ${\rm S} = {\rm S}_0 \times (\nu / \nu_0)^{\alpha(\nu)},$
+	    </div>
+	    where ${\rm S}$ is the flux density in Jy at the frequency $\nu$ in GHz, and
+	    ${\rm S}_0$ is the flux density in Jy at the frequency $\nu_0$ in GHz; we call
+	    this $\nu_0$ the reference frequency. The spectral index $\alpha(\nu)$ is defined
+	    to be:
+	    <div class="equation">
+	      $\alpha(\nu) = \alpha_0 + \gamma\times(\alpha_1 + \gamma\times\alpha_2),$
+	    </div>
+	    where
+	    <div class="equation">
+	      $\gamma = \ln(\nu / \nu_0).$
+	    </div>
+	    There is a fairly straightforward way of translating between the coefficients
+	    derived from a linear fit to the $\alpha$s needed by Miriad, and this is what
+	    occurs when you ask for the "mfflux compatible" coefficients.
+	  </div>
+	  <div>
+	    From the mfcal help page for the "flux" parameter:
+	    <code><pre>
+Key: flux
+        Three to five numbers, giving the source flux density, a reference
+        frequency (in GHz) and the source spectral index parameters.
+        The flux and spectral index parameters are at the reference frequency.
+        If no values are given, then MFCAL checks whether the source is one
+        of a set of known sources, and uses the appropriate flux variation
+        with frequency. Otherwise the default flux is determined so that
+        the rms gain amplitude is 1, and the default spectral index is 0.
+        The default reference frequency is the mean of the frequencies in
+        the input data. Also see the `oldflux' option.</pre></code>
+	  </div>
+	  <div>
+	    From the example above, the coefficients 7.217E-01,-2.338E-01,3.738E-01
+	    translate into a "flux" parameter of 4.8437,2.1,0.0071,0.1623.
+	  </div>
+	</div> <!-- View Page: Flux Density Request -->
+	<div>
 	  <a name="view-page-flux-density-time-series">&nbsp;</a>
 	  <h3>View Page: Flux Density Time Series</h3>
 	  <img src="view-page-flux-density-time-series.png">
