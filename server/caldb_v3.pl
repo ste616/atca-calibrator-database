@@ -6,6 +6,7 @@ use CalDB;
 use CGI qw(:standard);
 use Data::Dumper;
 use Astro::Time;
+use Astro::Coord;
 use JSON;
 
 use strict; use warnings;
@@ -60,8 +61,8 @@ my $action = $input{'action'};
 #$action = "source_all_details";
 #$input{'source'} = "0420-625";
 #$input{'mode'} = "cals";
-#$input{'radec'} = "12:56:11.166560,-05:47:21.524580";
-#$input{'type'} = "j2000";
+#$input{'radec'} = "00:00:00.0,01:00:00.0";
+#$input{'type'} = "galactic";
 #$input{'theta'} = 20;
 #$input{'flimit'} = 0.125;
 #$input{'frequencies'} = "2100,2100";
@@ -169,6 +170,17 @@ if ($action && $action eq 'info') {
 	"suitability. Flux densities should be taken as a guide only. The ".
 	"fluxes are taken from a variety of sources of differing accuracy. ".
 	"Calibrator fluxes are often variable, perhaps significantly so.</heading>\n";
+    # Convert Galactic coordinates into J2000 if required.
+    if ($input{'type'} eq "galactic") {
+	my @posels = split(/\,/, $input{'radec'});
+	my $plong = str2turn($posels[0], 'D');
+	my $plat = str2turn($posels[1], 'D');
+	my ($ora, $odec) = coord_convert($plong, $plat, 6, 4);
+	my $sra = turn2str($ora, 'H', 1);
+	my $sdec = turn2str($odec, 'D', 1);
+	$input{'radec'} = "$sra,$sdec";
+    }
+
     &get_scheduler_info($input{'radec'}, $input{'theta'},
 			$input{'flimit'}, $input{'frequencies'});
     print "</caltable>\n";
