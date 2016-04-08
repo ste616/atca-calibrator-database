@@ -318,6 +318,37 @@ require([ "dojo/store/Memory", "dijit/form/FilteringSelect", "atnf/base", "dojo/
 		});
 	    };
 
+	    var alterStructurePlotAxesRange = function() {
+		// Check the axis range.
+		if (!plotsMade.uvPoints) {
+		    return;
+		}
+		var a = plotsMade.uvPoints.getPlot('default').getSeriesStats();
+		a.vmax += 0.02;
+		a.vmin -= 0.02;
+		// Make them symmetrical.
+		if (Math.abs(a.vmax) > Math.abs(a.vmin)) {
+		    a.vmax = Math.abs(a.vmax);
+		    a.vmin = -1 * Math.abs(a.vmax);
+		} else {
+		    a.vmax = Math.abs(a.vmin);
+		    a.vmin = -1 * Math.abs(a.vmin);
+		}
+		plotsMade.uvPoints.addAxis('y', {
+		    'font': chartFont,
+		    'titleFont': chartFont,
+		    'title': "Residual Amplitude (Jy)",
+		    'titleOrientation': 'axis',
+		    'natural': false,
+		    'fixed': false,
+		    'vertical': true,
+		    'min': a.vmin,
+		    'max': a.vmax,
+		    'fixLower': 'major',
+		    'fixUpper': 'major'
+		});
+	    };
+
 	    // A routine to remove or add back series from the plots.
 	    var changePlots = function(evtObj) {
 		var tband = evtObj.target.id.replace(/^.*Show/, '');
@@ -341,6 +372,10 @@ require([ "dojo/store/Memory", "dijit/form/FilteringSelect", "atnf/base", "dojo/
 		}
 		alterTimeSeriesAxesRange();
 		plotsMade.timeSeries.render();
+		alterStructurePlotAxesRange();
+		if (plotsMade.uvPoints) {
+		    plotsMade.uvPoints.render();
+		}
 	    };
 
 	    // Setup the buttons.
@@ -646,7 +681,7 @@ require([ "dojo/store/Memory", "dijit/form/FilteringSelect", "atnf/base", "dojo/
 		// Start by making our plot area if we haven't already.
 		if (!plotsMade.timeSeries) {
 		    var minTime = '2003-01-01T00:00:00';
-		    var maxTime = '2016-01-01T00:00:00';
+		    var maxTime = '2017-01-01T00:00:00';
 		    var minAtime = atnfTime.new({ 'utcString': minTime});
 		    var maxAtime = atnfTime.new({ 'utcString': maxTime});
 
@@ -798,6 +833,10 @@ require([ "dojo/store/Memory", "dijit/form/FilteringSelect", "atnf/base", "dojo/
 		    if (plotDone) {
 			alterTimeSeriesAxesRange();
 			plotsMade.timeSeries.render();
+			alterStructurePlotAxesRange();
+			if (plotsMade.uvPoints) {
+			    plotsMade.uvPoints.render();
+			}
 		    }
 		    // Show the plot box if we haven't already.
 		    if (!timeSeriesShown &&
@@ -963,6 +1002,11 @@ require([ "dojo/store/Memory", "dijit/form/FilteringSelect", "atnf/base", "dojo/
 			}).play();
 			uvPointsShown = true;
 			addQuickLink('uvResiduals', 'Structure Plot');
+			// Change the axis ranges now.
+			alterStructurePlotAxesRange();
+			if (plotsMade.uvPoints) {
+			    plotsMade.uvPoints.render();
+			}
 		    }
 		}
 	    };

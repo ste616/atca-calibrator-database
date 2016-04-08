@@ -191,20 +191,24 @@ require([ "atnf/base", "dojo/dom", "dojo/dom-construct", "dojo/dom-attr",
 			    tr.appendChild(td);
 			}
 			td = domConstruct.create('td', {
-			    'innerHTML': atnf.turns2hexa(
-				matches[i].skyRightAscension.toTurns(), {
-				    'units': 'hours',
-				    'precision': 0
-				})
+			    // 'innerHTML': atnf.turns2hexa(
+			    // 	matches[i].skyRightAscension.toTurns(), {
+			    // 	    'units': 'hours',
+			    // 	    'precision': 0
+			    // })
+			    'innerHTML': matches[i].rightascension,
+			    'class': "position"
 			});
 			tr.appendChild(td);
 			td = domConstruct.create('td', {
-			    'innerHTML': atnf.turns2hexa(
-				matches[i].skyDeclination.toTurns(), {
-				    'units': 'degrees',
-				    'precision': 0,
-				    'alwaysSigned': true
-				})
+			    // 'innerHTML': atnf.turns2hexa(
+			    // 	matches[i].skyDeclination.toTurns(), {
+			    // 	    'units': 'degrees',
+			    // 	    'precision': 0,
+			    // 	    'alwaysSigned': true
+			    // 	})
+			    'innerHTML': matches[i].declination,
+			    'class': "position"
 			});
 			tr.appendChild(td);
 			for (var j = 0; j < caldb.bands.length; j++) {
