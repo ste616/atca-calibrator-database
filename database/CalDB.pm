@@ -36,7 +36,7 @@ CalDB::Measurement->has_many(fluxdensities => 'CalDB::FluxDensity');
 CalDB::Measurement->has_a(epoch_id => 'CalDB::Epoch');
 CalDB::Measurement->set_sql(data => qq{
     SELECT atca_caldb_measurement.meas_id,source_name,rightascension,declination,observation_mjd_start,observation_mjd_integration,frequency_band,self_calibrated,fluxdensity_fit_coeff,fluxdensity_fit_scatter,kstest_d,kstest_prob,reduced_chisquare
-    FROM atca_caldb_measurement INNER JOIN atca_caldb_fluxdensity
+    FROM atca_caldb_measurement LEFT JOIN atca_caldb_fluxdensity
     ON (atca_caldb_measurement.meas_id = atca_caldb_fluxdensity.meas_id)
     WHERE epoch_id = ? AND public >= ? });
 CalDB::Measurement->set_sql(closure => qq{
@@ -68,7 +68,7 @@ CalDB::Measurement->set_sql(smallflux => qq{
     AND public=1
 });
 CalDB::Measurement->set_sql(allfluxdensities => qq{
-    SELECT source_name,rightascension,declination,observation_mjd_start,observation_mjd_end,observation_mjd_integration,frequency_band,epoch_id,band_fluxdensity,band_fluxdensity_frequency,fluxdensity_fit_coeff
+    SELECT source_name,rightascension,declination,observation_mjd_start,observation_mjd_end,observation_mjd_integration,frequency_band,epoch_id,band_fluxdensity,band_fluxdensity_frequency,fluxdensity_fit_coeff,fluxdensity_fit_scatter
     FROM atca_caldb_measurement
     RIGHT JOIN atca_caldb_fluxdensity ON (atca_caldb_fluxdensity.meas_id=atca_caldb_measurement.meas_id)
     WHERE public=1 
@@ -116,7 +116,7 @@ CalDB::EpochSummary->columns(All => qw/summary_id epoch_id frequency_band n_sour
 CalDB::EpochSummary->has_a(epoch_id => 'CalDB::Epoch');
 CalDB::EpochSummary->set_sql(project => qq{
     SELECT array,mjd_start,mjd_end,GROUP_CONCAT(frequency_band) AS bands,GROUP_CONCAT(n_sources) AS n_sources,GROUP_CONCAT(integration_time) AS integration_times
-    FROM atca_caldb_epoch INNER JOIN atca_caldb_epochsummary
+    FROM atca_caldb_epoch LEFT JOIN atca_caldb_epochsummary
     ON (atca_caldb_epoch.epoch_id = atca_caldb_epochsummary.epoch_id)
     WHERE project_code = ?
     GROUP BY atca_caldb_epoch.epoch_id});
