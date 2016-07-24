@@ -342,14 +342,24 @@ require([ "dojo/store/Memory", "dijit/form/FilteringSelect", "atnf/base", "dojo/
 			replace(/\s/g, '');
 		    var decRange = domAttr.get('searchDecRange', 'value').
 			replace(/\s/g, '');
-		    if (raRange.length === 0 ||
+
+		    // We will enable slab search if either range is filled in,
+		    // and let the other range default to its full range.
+		    if (raRange.length === 0 &&
 			decRange.length === 0) {
 			slabSearch = false;
 		    } else {
+			if (raRange.length === 0) {
+			    raRange = '0,24';
+			}
 			var raEls = raRange.split(/\,/g);
+			if (decRange.length === 0) {
+			    decRange = '-90,90';
+			}
 			var decEls = decRange.split(/\,/g);
 
-			if (raEls.length !== 2 ||
+
+			if (raEls.length !== 2 &&
 			    decEls.length !== 2) {
 			    slabSearch = false;
 			} else {
