@@ -4,6 +4,8 @@ use lib '/n/ste616/usr/lib/perl5/lib/perl5';
 use CalDBkaputar;
 use CalDB;
 use Data::Dumper;
+use Statistics::Descriptive;
+use strict;
 
 # Go through the calibrator database and update some summary information
 # so calibrator searches are fast and the statistics page can be
@@ -11,7 +13,8 @@ use Data::Dumper;
 my %arguments = (
     'update-latest' => 1,
     'update-measurements' => 1,
-    'update-summaries' => 1
+    'update-summaries' => 1,
+    'update-qualities' => 1
     );
 for (my $i = 0; $i <= $#ARGV; $i++) {
     if ($ARGV[$i] eq "--skip-latest") {
@@ -23,6 +26,9 @@ for (my $i = 0; $i <= $#ARGV; $i++) {
     } elsif ($ARGV[$i] eq "--skip-summaries") {
 	# Don't update the epoch summaries.
 	$arguments{'update-summaries'} = 0;
+    } elsif ($ARGV[$i] eq "--skip-qualities") {
+	# Don't update the calibrator qualities.
+	$arguments{'update-qualities'} = 0;
     }
 }
 
@@ -130,6 +136,140 @@ if ($arguments{'update-summaries'} == 1) {
 	}
     }
     print "\n";
+}
+
+my %arrayNames = ( '6A' => "6km", '6B' => "6km", '6C' => "6km", '6D' => "6km",
+		   '1.5A' => "1.5km", '1.5B' => "1.5km", '1.5C' => "1.5km", '1.5D' => "1.5km",
+		   '750A' => "750m", '750B' => "750m", '750C' => "750m", '750D' => "750m",
+		   'EW367' => "small", 'EW352' => "small", 'H214' => "small", 'H168' => "small",
+		   'H75' => "small" );
+
+# Step 4. Determine the quality of each calibrator as a function of array size and band.
+if ($arguments{'update-qualities'} == 1) {
+    print "4. Updating calibrator qualities.";
+    my $cal_iterator = CalDB::Calibrator->retrieve_all;
+    while (my $cal = $cal_iterator->next) {
+	print "  Calibrator: ".$cal->name."\n";
+	my @measurements = CalDB::Measurement->search_allinformation($cal->name);
+	my %arraySpecs;
+	foreach my $a (keys %arrayNames) {
+	    if (!defined $arraySpecs{$arrayNames{$a}}) {
+		$arraySpecs{$arrayNames{$a}} = {};
+		for (my $i = 0; $i <= $#bands; $i++) {
+		    $arraySpecs{$arrayNames{$a}}->{$bands[$i]} = {
+			'closurePhases' => [], 'defects' => [],
+			'fluxDensities' => [], 'closurePhaseMedian' => -999,
+			'defectMedian' => -999, 'fluxDensityMedian' => -999,
+			'fluxDensityStdDev' => -999, 'qualityFlag' => -1
+		    };
+		}
+	    }
+	}
+	for (my $i = 0; $i <= $#measurements; $i++) {
+	    my $meas = $measurements[$i];
+	    my @cs = split(/\,/, $meas->fluxdensity_fit_coeff);
+	    my @aels = split(/\s+/, $meas->array);
+	    my $a = $aels[0];
+	    my $b = $meas->frequency_band;
+	    if (defined $arrayNames{$a}) {
+		my $arr = $arrayNames{$a};
+		my @f_closure_phase_averages = split(/\,/, $meas->f_closure_phase_average);
+		for (my $j = 0; $j <= $#f_closure_phase_averages; $j++) {
+		    push @{$arraySpecs{$arr}->{$b}->{'closurePhases'}}, $f_closure_phase_averages[$j];
+		}
+		my $defect = ($meas->fluxdensity_scalar_averaged / $meas->fluxdensity_vector_averaged) - 1;
+		push @{$arraySpecs{$arr}->{$b}->{'defects'}}, $defect;
+		my $fd = &coeff2flux(\@cs, ($band_frequencies{$b} / 1000));
+		push @{$arraySpecs{$arr}->{$b}->{'fluxDensities'}}, $fd;
+	    }
+	}
+	# Do some calculations.
+	foreach my $a (keys %arraySpecs) {
+	    for (my $i = 0; $i <= $#bands; $i++) {
+		my $r = $arraySpecs{$a}->{$bands[$i]};
+		if ($#{$r->{'closurePhases'}} >= 0) {
+		    my $stat_closurePhases = Statistics::Descriptive::Full->new();
+		    $stat_closurePhases->add_data($r->{'closurePhases'});
+		    $r->{'closurePhaseMedian'} = $stat_closurePhases->median();
+		}
+		if ($#{$r->{'defects'}} >= 0) {
+		    my $stat_defects = Statistics::Descriptive::Full->new();
+		    $stat_defects->add_data($r->{'defects'});
+		    $r->{'defectMedian'} = $stat_defects->median();
+		}
+		if ($#{$r->{'fluxDensities'}} >= 0) {
+		    my $stat_fluxDensities = Statistics::Descriptive::Full->new();
+		    $stat_fluxDensities->add_data($r->{'fluxDensities'});
+		    $r->{'fluxDensityMedian'} = $stat_fluxDensities->median();
+		    $r->{'fluxDensityStdDev'} = $stat_fluxDensities->standard_deviation();
+		}
+		# And calculate the quality.
+		if (($r->{'closurePhaseMedian'} != -999) &&
+		    ($r->{'defectMedian'} != -999) &&
+		    ($r->{'fluxDensityMedian'} != -999) &&
+		    ($r->{'fluxDensityStdDev'} != -999)) {
+		    $r->{'qualityFlag'} = 4; # This is the maximum value.
+		    if ($r->{'closurePhaseMedian'} >= 3) {
+			$r->{'qualityFlag'} -= 1;
+		    }
+		    if ($r->{'closurePhaseMedian'} >= 10) {
+			$r->{'qualityFlag'} -= 1;
+		    }
+		    if ($r->{'defectMedian'} >= 1.05) {
+			$r->{'qualityFlag'} -= 1;
+		    }
+		    if ($r->{'fluxDensityStdDev'} > ($r->{'fluxDensityMedian'} / 2)) {
+			$r->{'qualityFlag'} -= 1;
+		    }
+		    print "    quality at $bands[$i] for $a array: ".$r->{'qualityFlag'}."\n";
+		    if (($a eq "6km") && ($bands[$i] eq "16cm")) {
+			$cal->quality_6000_16($r->{'qualityFlag'});
+		    } elsif (($a eq "6km") && ($bands[$i] eq "4cm")) {
+			$cal->quality_6000_4($r->{'qualityFlag'});
+		    } elsif (($a eq "6km") && ($bands[$i] eq "15mm")) {
+			$cal->quality_6000_15($r->{'qualityFlag'});
+		    } elsif (($a eq "6km") && ($bands[$i] eq "7mm")) {
+			$cal->quality_6000_7($r->{'qualityFlag'});
+		    } elsif (($a eq "6km") && ($bands[$i] eq "3mm")) {
+			$cal->quality_6000_3($r->{'qualityFlag'});
+		    } elsif (($a eq "1.5km") && ($bands[$i] eq "16cm")) {
+			$cal->quality_1500_16($r->{'qualityFlag'});
+		    } elsif (($a eq "1.5km") && ($bands[$i] eq "4cm")) {
+			$cal->quality_1500_4($r->{'qualityFlag'});
+		    } elsif (($a eq "1.5km") && ($bands[$i] eq "15mm")) {
+			$cal->quality_1500_15($r->{'qualityFlag'});
+		    } elsif (($a eq "1.5km") && ($bands[$i] eq "7mm")) {
+			$cal->quality_1500_7($r->{'qualityFlag'});
+		    } elsif (($a eq "1.5km") && ($bands[$i] eq "3mm")) {
+			$cal->quality_1500_3($r->{'qualityFlag'});
+		    } elsif (($a eq "750m") && ($bands[$i] eq "16cm")) {
+			$cal->quality_750_16($r->{'qualityFlag'});
+		    } elsif (($a eq "750m") && ($bands[$i] eq "4cm")) {
+			$cal->quality_750_4($r->{'qualityFlag'});
+		    } elsif (($a eq "750m") && ($bands[$i] eq "15mm")) {
+			$cal->quality_750_15($r->{'qualityFlag'});
+		    } elsif (($a eq "750m") && ($bands[$i] eq "7mm")) {
+			$cal->quality_750_7($r->{'qualityFlag'});
+		    } elsif (($a eq "750m") && ($bands[$i] eq "3mm")) {
+			$cal->quality_750_3($r->{'qualityFlag'});
+		    } elsif (($a eq "small") && ($bands[$i] eq "16cm")) {
+			$cal->quality_375_16($r->{'qualityFlag'});
+		    } elsif (($a eq "small") && ($bands[$i] eq "4cm")) {
+			$cal->quality_375_4($r->{'qualityFlag'});
+		    } elsif (($a eq "small") && ($bands[$i] eq "15mm")) {
+			$cal->quality_375_15($r->{'qualityFlag'});
+		    } elsif (($a eq "small") && ($bands[$i] eq "7mm")) {
+			$cal->quality_375_7($r->{'qualityFlag'});
+		    } elsif (($a eq "small") && ($bands[$i] eq "3mm")) {
+			$cal->quality_375_3($r->{'qualityFlag'});
+		    }
+		    $cal->update;
+		} else {
+		    print "    quality undetermined\n";
+		}
+	    }
+	}
+    }
 }
 
 sub coeff2flux {

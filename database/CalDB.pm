@@ -131,7 +131,7 @@ CalDB::Epoch->has_many(summaries => 'CalDB::EpochSummary');
 package CalDB::Calibrator;
 use base 'CalDB::DBI';
 CalDB::Calibrator->table('atca_caldb_calibratorinfo');
-CalDB::Calibrator->columns(All => qw/cal_id name rightascension declination notes catalogue info vla_text latest_16cm latest_4cm latest_15mm latest_7mm latest_3mm ra_decimal dec_decimal/);
+CalDB::Calibrator->columns(All => qw/cal_id name rightascension declination notes catalogue info vla_text latest_16cm latest_4cm latest_15mm latest_7mm latest_3mm ra_decimal dec_decimal quality_6000_16 quality_6000_4 quality_6000_15 quality_6000_7 quality_6000_3 quality_1500_16 quality_1500_4 quality_1500_15 quality_1500_7 quality_1500_3 quality_750_16 quality_750_4 quality_750_15 quality_750_7 quality_750_3 quality_375_16 quality_375_4 quality_375_15 quality_375_7 quality_375_3/);
 CalDB::Calibrator->columns(TEMP => qw/fluxdensities fluxdensities_bands measids fluxdensities_coeffs/);
 CalDB::Calibrator->columns(Essential => qw/name rightascension declination ra_decimal dec_decimal/);
 CalDB::Calibrator->set_sql(c007 => qq{
@@ -146,6 +146,10 @@ CalDB::Calibrator->set_sql(c007 => qq{
     WHERE (catalogue = 'vla' OR catalogue = 'atca' OR catalogue = 'lcs1')
     GROUP BY name});
 
+CalDB::Calibrator->set_sql(calibrator_quality => qq{
+    SELECT name,quality_6000_16,quality_6000_4,quality_6000_15,quality_6000_7,quality_6000_3,quality_1500_16,quality_1500_4,quality_1500_15,quality_1500_7,quality_1500_3,quality_750_16,quality_750_4,quality_750_15,quality_750_7,quality_750_3,quality_375_16,quality_375_4,quality_375_15,quality_375_7,quality_375_3
+    FROM atca_caldb_calibratorinfo
+    WHERE name = ?});
 CalDB::Calibrator->set_sql(position => qq{
     SELECT cal_id,name,atca_caldb_calibratorinfo.rightascension,atca_caldb_calibratorinfo.declination,group_concat(band_fluxdensity) AS fluxdensities,group_concat(frequency_band) AS fluxdensities_bands,group_concat(atca_caldb_measurement.meas_id) AS measids
     FROM atca_caldb_calibratorinfo INNER JOIN atca_caldb_measurement
