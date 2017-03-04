@@ -196,6 +196,12 @@ if ($action && $action eq 'info') {
 	%output = &get_date_flux_models($input{'source'}, $input{'mjd'}, 
 					$input{'band'});
     }
+} elsif ($action && $action eq "source_quality") {
+    if (!$input{'source'}) {
+	$output{'error'} = "No source specified.";
+    } else {
+	%output = &get_source_quality($input{'source'});
+    }
 }
 
 
@@ -210,6 +216,44 @@ print $json->utf8->encode(\%output);
 #print "\n";
 
 exit;
+
+sub get_source_quality {
+    my $source = shift;
+
+    my @qualities = CalDB::Calibrator->search_calibrator_quality($source);
+    my %output;
+    
+    for (my $i = 0; $i <= $#qualities; $i++) {
+	$output{$qualities[$i]->name} = { 
+	    '6km' => { 
+		'16cm' => $qualities[$i]->quality_6000_16,
+		'4cm' => $qualities[$i]->quality_6000_4,
+		'15mm' => $qualities[$i]->quality_6000_15,
+		'7mm' => $qualities[$i]->quality_6000_7,
+		'3mm' => $qualities[$i]->quality_6000_3
+	    },'1.5km' => { 
+		'16cm' => $qualities[$i]->quality_1500_16,
+		'4cm' => $qualities[$i]->quality_1500_4,
+		'15mm' => $qualities[$i]->quality_1500_15,
+		'7mm' => $qualities[$i]->quality_1500_7,
+		'3mm' => $qualities[$i]->quality_1500_3
+	    },'750m' => { 
+		'16cm' => $qualities[$i]->quality_750_16,
+		'4cm' => $qualities[$i]->quality_750_4,
+		'15mm' => $qualities[$i]->quality_750_15,
+		'7mm' => $qualities[$i]->quality_750_7,
+		'3mm' => $qualities[$i]->quality_750_3
+	    },'375m' => { 
+		'16cm' => $qualities[$i]->quality_375_16,
+		'4cm' => $qualities[$i]->quality_375_4,
+		'15mm' => $qualities[$i]->quality_375_15,
+		'7mm' => $qualities[$i]->quality_375_7,
+		'3mm' => $qualities[$i]->quality_375_3
+	    }
+	};
+    }
+    return %output;
+}
 
 sub get_scheduler_info {
     my $radec = shift;
