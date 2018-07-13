@@ -132,13 +132,14 @@ def main(args):
 
             # Get rid of the bad epochs.
             adtimes = dtimes.datetime
+            ajtimes = dtimes.jd - 2400000.5
             adtimes = np.delete(adtimes, remeps, 0)
-            atimes = np.delete(np.array(times), remeps, 0)
+            ajtimes = np.delete(ajtimes, remeps, 0)
             y = np.delete(y, remeps, 0)
             if (args.top_mjd):
                 # Make a top x-axis with MJD showing.
-                ax2.plot(atimes, y, symbols[e], markersize=8)
-                ax2.cla()
+                ax2.plot(ajtimes, y, symbols[e], color=colours[e], markersize=8)
+                #ax2.cla()
             if (args.plot_uncertainties):
                 yu = np.delete(uncertainties, remeps, 0)
 
@@ -163,9 +164,14 @@ def main(args):
         ax.set_ylabel("Spectral Index")
     else:
         ax.set_ylabel("Flux Density [Jy]")
-    xmg, ymg = plt.margins()
-    ax.margins(x=xmg + 0.05)
+    xmg, ymg = ax2.margins()
+    #ax.margins(x=xmg)
     ax2.margins(x=xmg + 0.05)
+    dms = Time(ax2.get_xlim(), format='mjd', scale='utc')
+    ax.set_xlim(dms.datetime)
+    print dms.datetime
+    print ax.get_xlim()
+    print ax2.get_xlim()
     #if (args.top_mjd):
     #    plt.margins(x=0.)
 
