@@ -51,6 +51,15 @@ print " Done, ".($#calibrators + 1)." calibrators found.\n";
 
 #print Dumper(@calibrators);
 
+# Get rid of those with declinations below -20.
+my @ncalibrators;
+for (my $i = 0; $i <= $#calibrators; $i++) {
+    if ($calibrators[$i]->dec_decimal >= -20) {
+	push @ncalibrators, $calibrators[$i];
+    }
+}
+@calibrators = @ncalibrators;
+
 # Prioritise those calibrators that have not been observed at all
 # at this band.
 my @priority_list;
@@ -186,29 +195,31 @@ print " Done.\n";
 my @sorted_seeds = sort { $a->ra_decimal <=> $b->ra_decimal } @seed_calibrators;
 open(S, ">".$arguments{'schedule'});
 for (my $i = 0; $i <= $#sorted_seeds; $i++) {
-    for (my $j = 0; $j < 3; $j++) {
+#    for (my $j = 0; $j < 3; $j++) {
 	&schedoutput_start(S);
-	if ($i == 0 && $j == 0) {
+#	if ($i == 0 && $j == 0) {
 	    &schedoutput_preamble(S, "C007", $freqs[$bf]);
-	}
-	if ($j == 0) {
-	    &schedoutput_source(S, $sorted_seeds[$i], "00:02:00", "point");
-	} elsif ($j == 1) {
-	    &schedoutput_source(S, $sorted_seeds[$i], "00:02:00", "paddle");
-	} elsif ($j == 2) {
-	    &schedoutput_source(S, $sorted_seeds[$i], "00:04:00", "offset");
-	}
+	    &schedoutput_source(S, $sorted_seeds[$i], "00:04:00", "dwell");
+#	}
+#	if ($j == 0) {
+#	    &schedoutput_source(S, $sorted_seeds[$i], "00:02:00", "point");
+#	} elsif ($j == 1) {
+#	    &schedoutput_source(S, $sorted_seeds[$i], "00:02:00", "paddle");
+#	} elsif ($j == 2) {
+#	    &schedoutput_source(S, $sorted_seeds[$i], "00:04:00", "offset");
+#	}
 	&schedoutput_end(S);
-    }
+#    }
     my $r = $collections{"s".$sorted_seeds[$i]->name};
     for (my $j = 0; $j < $#{$r->{'sources'}}; $j++) {
 	&schedoutput_start(S);
-	if ($j > 0 && ($j % 5 == 0)) {
-	    &schedoutput_source(S, $r->{'sources'}->[$j], "00:02:00", "paddle");
-	    &schedoutput_end(S);
-	    &schedoutput_start(S);
-	}
-	&schedoutput_source(S, $r->{'sources'}->[$j], "00:04:00", "offset");
+#	if ($j > 0 && ($j % 5 == 0)) {
+#	    &schedoutput_source(S, $r->{'sources'}->[$j], "00:02:00", "paddle");
+#	    &schedoutput_end(S);
+#	    &schedoutput_start(S);
+#	}
+#	&schedoutput_source(S, $r->{'sources'}->[$j], "00:04:00", "offset");
+	&schedoutput_source(S, $r->{'sources'}->[$j], "00:04:00", "dwell");
 	&schedoutput_end(S);
     }
 }
