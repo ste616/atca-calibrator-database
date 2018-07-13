@@ -93,7 +93,8 @@ def main(args):
     matplotlib.rcParams.update({ 'font.size': 22 })
     
     fig, ax = plt.subplots()
-    ax2 = ax.twiny()
+    if (args.top_mjd):
+        ax2 = ax.twiny()
 
     symbols = [ "o", "^", "s", "D", "*", "h" ]
     colours = [ "blue", "green", "red", "orange", "magenta", "black" ]
@@ -164,17 +165,16 @@ def main(args):
         ax.set_ylabel("Spectral Index")
     else:
         ax.set_ylabel("Flux Density [Jy]")
-    xmg, ymg = ax2.margins()
-    #ax.margins(x=xmg)
-    ax2.margins(x=xmg + 0.05)
-    dms = Time(ax2.get_xlim(), format='mjd', scale='utc')
-    ax.set_xlim(dms.datetime)
-    print dms.datetime
-    print ax.get_xlim()
-    print ax2.get_xlim()
-    #if (args.top_mjd):
-    #    plt.margins(x=0.)
 
+    if (args.top_mjd):
+        xmg, ymg = ax2.margins()
+        ax2.margins(x=xmg + 0.05)
+        dms = Time(ax2.get_xlim(), format='mjd', scale='utc')
+        ax.set_xlim(dms.datetime)
+    else:
+        xmg, ymg = ax.margins()
+        ax.margins(x=xmg + 0.05)
+        
     fig.set_size_inches(11.69, 8.27)
     if (not args.top_mjd):
         plt.legend(bbox_to_anchor=(0., 1.01, 1., .102), loc=3, fontsize=15,
